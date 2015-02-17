@@ -1,8 +1,36 @@
-# module Test
-#   def Resource(options)
-#
-#   end
-# end
+
+
+module Test
+  Resource = lambda {|options| 
+
+    Module.new do 
+      @@options = options
+      def index
+        raise @@options[:message] 
+      end
+
+      def self.included(klass)
+        puts klass
+        klass.get
+      end
+  
+    end }
+
+end
+
+class Controller
+  
+
+  def self.get
+    puts 'get was called'
+  end
+  
+ include Test::Resource.({message: "Wassssupp?"}) 
+
+end
+
+Controller.new.index
+
 
 Platypus = Module.new do
   def first
