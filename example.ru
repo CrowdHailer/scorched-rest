@@ -2,31 +2,45 @@ require 'scorched'
 require_relative './lib/scorched/rest'
 
 
-module Test
-  def Resource(options)
+module Rest
+
+  def self.Resource(options)
     Module.new do
-      def first
-        puts 'hello'
+      @@pattern = options[:pattern]
+      def self.included(klass)
+
+        klass.get('/') { send :index }
+        klass.get('/new') { send :new }
+
+        klass.get(@@pattern) { |id| send :show, id}
+
       end
+      def index
+        raise 'index missing'
+      end
+
+      def new
+        raise 'new missing'
+      end
+
+      def show(id)
+        raise 'show missing'
+
+      end
+
     end
   end
 end
-
-Platypus = Test::Resource(7)
-
-class Cat
-    include Platypus
-end
-
-Cat.new.first
-
 class App < Scorched::Controller
-  include Scorched::Rest
+  include Rest::Resource({:pattern => /\/(\d+)/})
 
-  get '/show-somethinf' do
-
+  def index
+    'index found'
   end
-  # include Scorched::Rest
+
+  get '/something' do
+    'works'
+  end
 end
 
 run App
