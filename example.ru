@@ -31,16 +31,46 @@ module Rest
     end
   end
 end
+a = /\/(?<identifier>#{/ud\d{3}/i})/
+{
+  :integer => /\d+/,
+  :decimal => /\d+\.*\d*/,
+  :color => /#([0-9a-f]{6}|[0-9a-f]{3})/
+}
+
+
 class App < Scorched::Controller
-  include Rest::Resource({:pattern => /\/(\d+)/})
+  # include Rest::Resource({:pattern => /\/(\d+)/})
 
-  def index
-    'index found'
+  def self.patterns
+    {
+      :integer => /\d+/,
+      :decimal => /\d+\.*\d*/,
+      :color => /#([0-9a-f]{6}|[0-9a-f]{3})/,
+      :catalogue => /(UD|ud)(?<id>\d{3})/
+
+    }
   end
 
-  get '/something' do
-    'works'
+  get(/\/(?<identifier>#{patterns[:integer]})$/) do |id|
+    "integer found '#{id}'"
   end
+
+  get(/\/(?<identifier>#{patterns[:decimal]})$/) do |id|
+    "decimal found '#{id}'"
+  end
+
+  get(/\/(?<identifier>#{patterns[:catalogue]})$/) do |id, blah|
+    "catalogue found '#{id}'  '#{blah}'"
+  end
+
+  # def index
+  #   'index found'
+  # end
+  #
+  # get '/something' do
+  #   'works'
+  # end
 end
 
 run App
